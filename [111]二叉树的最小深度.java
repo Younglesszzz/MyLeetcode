@@ -33,6 +33,10 @@
 
 
 //leetcode submit region begin(Prohibit modification and deletion)
+
+import java.util.LinkedList;
+import java.util.Queue;
+
 /**
  * Definition for a binary tree node.
  * public class TreeNode {
@@ -49,14 +53,45 @@
  * }
  */
 class Solution {
-    public int minDepth(TreeNode root) {
-        if (root == null)
-            return 0;
+    //递归法
+    public int minDepth1(TreeNode root) {
+       if (root == null) return 0;
+
+       int leftside = minDepth(root.left);//左
+       int rightside = minDepth(root.right);//右
+
+        //中
+       //需要判断子树是否为空
+        int depth;
         if (root.left == null && root.right != null)
-            return 1 + minDepth(root.right);
-        if (root.left != null && root.right == null)
-            return 1 + minDepth(root.left);
-        return 1 + Math.min(minDepth(root.left), minDepth(root.right));
+           depth = 1 + rightside;
+        else if (root.left != null && root.right == null)
+           depth = 1 + leftside;
+        else//else中情况包括两边都是null和两边不为null的情况，都可以直接取最小值
+           depth =  1 + Math.min(leftside, rightside);
+
+
+        return depth;
     }
-}
+
+    //迭代法
+    public int minDepth(TreeNode root) {
+        if (root == null) return 0;
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.offer(root);
+        int depth = 0;
+        while (!queue.isEmpty()) {
+            int levelSize = queue.size();
+            depth++;//记录当前层数（深度）
+            for (int i = 0; i < levelSize; i++) {
+                TreeNode front = queue.poll();
+                if (front.left != null) queue.offer(front.left);
+                if (front.right != null) queue.offer(front.right);
+                //如果front就是叶子，直接返回当前层数
+                if (front.left == null && front.right == null)
+                    return depth;
+            }
+        }
+        return depth;
+    }
 //leetcode submit region end(Prohibit modification and deletion)

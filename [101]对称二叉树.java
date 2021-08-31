@@ -32,6 +32,8 @@
 
 
 //leetcode submit region begin(Prohibit modification and deletion)
+
+
 /**
  * Definition for a binary tree node.
  * public class TreeNode {
@@ -47,21 +49,99 @@
  *     }
  * }
  */
+
+import java.util.Deque;
+import java.util.LinkedList;
+import java.util.Queue;
+
 class Solution {
-    public boolean isSymmetric(TreeNode root) {
-        return (check(root.left, root.right));
+    public boolean isSymmetric1(TreeNode root) {
+        if (root == null) return true;
+        return compare(root.left, root.right);
     }
 
-    public boolean check(TreeNode node1, TreeNode node2) {
-        if (node1 == null && node2 == null)
-            return true;
-        else if (node1 == null || node2 == null)
-            return false;
-        if (node1.val == node2.val && check(node1.left, node2.right) && check(node1.right, node2.left)) {
-            return true;
-        } else {
-            return false;
-        }
+    public boolean compare(TreeNode node1, TreeNode node2) {
+        //先处理
+        if (node1 == null && node2 != null) return false;
+        else if (node1 != null && node2 == null) return false;
+        else if (node1 == null && node2 == null) return true;
+        else if (node1.val != node2.val) return false;
+
+        //此时为节点不为空且数值相等的情况
+        boolean outside = compare(node1.left, node2.right);// 左子树：左、 右子树：右
+        boolean inside = compare(node1.right, node2.left);// 左子树：右、 右子树：左
+        boolean isSame = outside & inside;// 左子树：中、 右子树：中 （逻辑处理）
+
+        return isSame;
     }
-}
+
+
+    /**
+     * 队列迭代法
+     * @思路 把左右两个子树要比较的元素顺序放入一个容器，成对的取出来比较
+     * @param root
+     * @return
+     */
+    public boolean isSymmetric2(TreeNode root) {
+        if (root == null) return true;
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.offer(root.left);
+        queue.offer(root.right);
+        while (!queue.isEmpty()) {
+            TreeNode leftNode = queue.poll();
+            TreeNode rightNode = queue.poll();
+
+            //先处理null的情况
+            if (leftNode == null && rightNode == null)
+                continue;
+
+            if ((leftNode == null && rightNode != null) || (leftNode != null && rightNode == null))
+                return false;
+
+            if (leftNode.val != rightNode.val)
+                return false;
+
+            //不为null且对称
+            //outside
+            queue.offer(leftNode.left);
+            queue.offer(rightNode.right);
+            //inside
+            queue.offer(leftNode.right);
+            queue.offer(rightNode.left);
+        }
+        return true;
+    }
+
+    public boolean isSymmetric(TreeNode root) {
+        //把symmetric2中的队列换成栈，一样成立，不做赘述
+        //细心的话，其实可以发现，这个迭代法，其实是把左右两个子树要比较的元素顺序放进一个容器，然后成对成对的取出来进行比较，那么其实使用栈也是可以的。
+        //只要把队列原封不动的改成栈就可以了，我下面也给出了代码
+        if (root == null) return true;
+        Deque<TreeNode> stack = new LinkedList<>();
+        stack.push(root.left);
+        stack.push(root.right);
+        while (!stack.isEmpty()) {
+            TreeNode rightNode = stack.pop();
+            TreeNode leftNode = stack.pop();
+
+            //先处理null的情况
+            if (leftNode == null && rightNode == null)
+                continue;
+
+            if ((leftNode == null && rightNode != null) || (leftNode != null && rightNode == null))
+                return false;
+
+            if (leftNode.val != rightNode.val)
+                return false;
+
+            stack.push(rightNode.left);
+            stack.push(leftNode.right);
+            stack.push(rightNode.right);
+            stack.push(leftNode.left);
+        }
+
+        return true;
+    }
+
+ }
 //leetcode submit region end(Prohibit modification and deletion)

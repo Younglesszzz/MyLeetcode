@@ -18,11 +18,12 @@
 
 //leetcode submit region begin(Prohibit modification and deletion)
 
-import javax.swing.tree.TreeNode;
+
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.LinkedList;
-
+import java.util.List;
 /**
  * Definition for a binary tree node.
  * public class TreeNode {
@@ -59,7 +60,7 @@ class Solution {
     /**
      * 迭代遍历法
      */
-    public List<Integer> postOrder(TreeNode root) {
+    public List<Integer> postorderTraversal(TreeNode root) {
         List<Integer> res = new LinkedList<>();
         Deque<TreeNode> stack = new LinkedList<>();
 
@@ -73,8 +74,15 @@ class Solution {
         while (!stack.isEmpty()) {
             TreeNode node = stack.pop();
             res.add(node.val);
-            stack.
+            if (node.left != null) {
+                stack.push(node.left);
+            }
+            if (node.right != null) {
+                stack.push(node.right);
+            }
         }
+        Collections.reverse(res);
+        return res;
     }
 
 }
